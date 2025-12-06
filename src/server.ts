@@ -21,32 +21,24 @@ initDB();
 //parser
 app.use(express.json());
 
-app.get('/',logger, (req: Request, res: Response) => {
+app.get('/', logger, (req: Request, res: Response) => {
     res.send('Hello World!')
 });
 
 //users post
-app.use("/api/v1/auth/signup", userRoutes)
+app.use("/", userRoutes);
 
-//     const { name, email, password, phone, role } = req.body;
-
+// app.get("/user", async (req: Request, res: Response) => {
 //     try {
-//         const result = await pool.query(`
-//             INSERT INTO users(name,email, password, phone, role)VALUES($1,$2,$3,$4,$5) RETURNING id, name, email, phone, role`, [name, email, password, phone, role]);
+//         const result = await pool.query(`SELECT * FROM users`);
 
-//         // Removing password before sending response
-//         // const user = result.rows[0];
-//         // delete user.password;
-//         // delete user.created_at;
-//         // delete user.updated_at;
-
-//         res.status(201).json({
-//             success: true,
-//             message: "User registered successfully",
-//             data: result.rows[0]
+//         res.status(200).json({
+//             success:true,
+//             message:"Users retrieved successfully",
+//             data:result.rows
 //         })
-
 //     } catch (err: any) {
+//         console.log("DB Error =>", err);
 //         res.status(500).json({
 //             success: false,
 //             message: "Api is not working"

@@ -28,6 +28,25 @@ const createUser = async (req: Request, res: Response) => {
     }
 };
 
-export const userControllers={
+const getUsers = async (req: Request, res: Response) => {
+    try {
+        const result = await userServices.getUsers();
+
+        res.status(200).json({
+            success: true,
+            message: "Users retrieved successfully",
+            data: result.rows
+        })
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
+}
+
+export const userControllers = {
     createUser,
+    getUsers,
 }
