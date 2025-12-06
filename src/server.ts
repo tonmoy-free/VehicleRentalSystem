@@ -34,37 +34,6 @@ app.use("/", vehicleRoutes);
 
 
 
-//Vehicles post or Create Vehicle
-
-// app.post("/api/v1/vehicles", async (req: Request, res: Response) => {
-//     const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = req.body;
-//     console.log(vehicle_name)
-
-//     try {
-//         const result = await pool.query(`
-//             INSERT INTO vehicles(vehicle_name, type, registration_number, daily_rent_price, availability_status)VALUES($1,$2,$3,$4,$5) RETURNING vehicle_name, type, registration_number, daily_rent_price, availability_status`, [vehicle_name, type, registration_number, daily_rent_price, availability_status]);
-
-//         //convert to number
-//         const vehicle = result.rows[0];
-//         vehicle.daily_rent_price = parseFloat(vehicle.daily_rent_price);
-
-
-//         res.status(201).json({
-//             success: true,
-//             message: "Vehicle created successfully",
-//             data: result.rows[0]
-//         })
-
-//     } catch (err: any) {
-//         console.log("DB Error =>", err);
-//         res.status(500).json({
-//             success: false,
-//             message: "Api is not working"
-//         })
-//     }
-// });
-
-
 //Bookings post or Create Booking
 app.post("/api/v1/bookings", async (req: Request, res: Response) => {
     const { customer_id, vehicle_id, rent_start_date, rent_end_date } = req.body;

@@ -29,7 +29,67 @@ const createVehicle = async (req: Request, res: Response) => {
     }
 };
 
+const getVehicle = async (req: Request, res: Response) => {
+    try {
+        const result = await vehicleServices.getVehicle();
+
+        const resultCount = result.rows;
+
+        if (resultCount.length === 0) {
+            res.status(200).json({
+                success: true,
+                message: "No vehicles found",
+                data: []
+            })
+        }
+
+        if (resultCount.length > 0) {
+            res.status(200).json({
+                success: true,
+                message: "Vehicles retrieved successfully",
+                data: result.rows
+            })
+        }
+
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
+};
+
+const deleteVehicle = async (req: Request, res: Response) => {
+    // console.log(req.params.id);
+    try {
+        const result = await vehicleServices.deleteVehicle(req.params.vehicleId);
+
+        if (result.rowCount === 0) {
+            res.status(404).json({
+                success: false,
+                message: "Vehicle not found",
+            })
+        } else {
+            res.status(200).json({
+                success: true,
+                message: "Vehicle deleted successfully",
+                data: result.rows[0],
+            })
+        }
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
+
+}
+
 
 export const vehicleController = {
     createVehicle,
+    getVehicle,
+    deleteVehicle,
 }

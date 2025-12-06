@@ -7,11 +7,11 @@ const router = express.Router();
 
 router.post("/api/v1/vehicles", vehicleController.createVehicle);
 
-// router.get("/api/v1/users", userControllers.getUsers);
+router.get("/api/v1/vehicles", vehicleController.getVehicle);
 
 // router.put("/api/v1/users/:userId", userControllers.updateUser);
 
-// router.delete("/api/v1/users/:userId", userControllers.deleteUser);
+router.delete("/api/v1/vehicles/:vehicleId", vehicleController.deleteVehicle);
 
 
 export const vehicleRoutes = router;
