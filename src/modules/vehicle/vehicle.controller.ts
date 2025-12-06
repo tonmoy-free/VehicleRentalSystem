@@ -44,10 +44,49 @@ const getVehicle = async (req: Request, res: Response) => {
         }
 
         if (resultCount.length > 0) {
+            // Convert string to number
+            const vehicle = result.rows[0];
+            vehicle.daily_rent_price = parseFloat(vehicle.daily_rent_price);
+            
             res.status(200).json({
                 success: true,
                 message: "Vehicles retrieved successfully",
-                data: result.rows
+                data: vehicle
+            })
+        }
+
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
+};
+
+const getVehicleById = async (req: Request, res: Response) => {
+    try {
+        const result = await vehicleServices.getVehicleById(req.params.vehicleId);
+
+        const resultCount = result.rows;
+
+        if (resultCount.length === 0) {
+            res.status(200).json({
+                success: true,
+                message: "No vehicles found",
+                data: []
+            })
+        }
+
+        if (resultCount.length > 0) {
+            // Convert string to number
+            const vehicle = result.rows[0];
+            vehicle.daily_rent_price = parseFloat(vehicle.daily_rent_price);
+
+            res.status(200).json({
+                success: true,
+                message: "Vehicles retrieved successfully",
+                data: vehicle
             })
         }
 
@@ -121,6 +160,7 @@ const deleteVehicle = async (req: Request, res: Response) => {
 export const vehicleController = {
     createVehicle,
     getVehicle,
+    getVehicleById,
     deleteVehicle,
     updateVehicle,
 }

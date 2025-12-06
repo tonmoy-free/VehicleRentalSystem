@@ -13,6 +13,12 @@ const getVehicle = async () => {
     return result;
 };
 
+const getVehicleById = async (id:any) => {
+    const result = await pool.query(`SELECT id, vehicle_name, type, registration_number, daily_rent_price, availability_status FROM vehicles WHERE id=$1`,[id]);
+
+    return result;
+};
+
 const updateVehicle = async (vehicle_name: string, type: string, registration_number: string, daily_rent_price: number, availability_status: string, id:any) => {
     const result = await pool.query(`UPDATE vehicles SET
              vehicle_name = COALESCE($1, vehicle_name),
@@ -38,6 +44,7 @@ const deleteVehicle = async (id: any) => {
 export const vehicleServices = {
     createVehicle,
     getVehicle,
+    getVehicleById,
     deleteVehicle,
     updateVehicle,
 }
