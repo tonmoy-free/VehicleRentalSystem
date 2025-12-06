@@ -1,77 +1,158 @@
 import express, { Request, Response } from 'express';
-import { Pool } from "pg";
-import dotenv from "dotenv";
-import path from "path";
 
-dotenv.config({ path: path.join(process.cwd(), '.env') });
+import config from './config';
+import initDB, { pool } from './config/db';
+import logger from './middleware/logger';
+import { userRoutes } from './modules/user/user.route';
+
+
+// dotenv.config({ path: path.join(process.cwd(), '.env') });
 const app = express()
-const port = `${process.env.PORT}`
-
-//DB
-const pool = new Pool({
-    connectionString: `${process.env.CONNECTION_STR}`
-});
+const port = config.port;
 
 
-const initDB = async () => {
-    await pool.query(`
-        CREATE TABLE IF NOT EXISTS users(
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100)NOT NULL,
-        email VARCHAR(105)UNIQUE NOT NULL,
-        age INT,
-        phone VARCHAR(15),
-        address TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW())`
-    );
 
-    await pool.query(`
-        CREATE TABLE IF NOT EXISTS todos(
-        id SERIAL PRIMARY KEY,
-        user_id INT REFERENCES users(id) ON DELETE CASCADE,
-        title VARCHAR(200) NOT NULL,
-        description TEXT,
-        completed BOOLEAN DEFAULT false,
-        due_date DATE,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-        )
-        `);
-};
 
+
+//initializing DB
 initDB();
 
 
 //parser
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/',logger, (req: Request, res: Response) => {
     res.send('Hello World!')
 });
 
-app.post("/users", async (req: Request, res: Response) => {
-    const { name, email } = req.body;
+//users post
+app.use("/api/v1/auth/signup", userRoutes)
+
+//     const { name, email, password, phone, role } = req.body;
+
+//     try {
+//         const result = await pool.query(`
+//             INSERT INTO users(name,email, password, phone, role)VALUES($1,$2,$3,$4,$5) RETURNING id, name, email, phone, role`, [name, email, password, phone, role]);
+
+//         // Removing password before sending response
+//         // const user = result.rows[0];
+//         // delete user.password;
+//         // delete user.created_at;
+//         // delete user.updated_at;
+
+//         res.status(201).json({
+//             success: true,
+//             message: "User registered successfully",
+//             data: result.rows[0]
+//         })
+
+//     } catch (err: any) {
+//         res.status(500).json({
+//             success: false,
+//             message: "Api is not working"
+//         })
+//     }
+// });
+
+
+//Vehicles post or Create Vehicle
+
+app.post("/api/v1/vehicles", async (req: Request, res: Response) => {
+    const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = req.body;
+    console.log(vehicle_name)
 
     try {
-
         const result = await pool.query(`
-            INSERT INTO users(name,email)VALUES($1,$2) RETURNING *`, [name, email]);
+            INSERT INTO vehicles(vehicle_name, type, registration_number, daily_rent_price, availability_status)VALUES($1,$2,$3,$4,$5) RETURNING vehicle_name, type, registration_number, daily_rent_price, availability_status`, [vehicle_name, type, registration_number, daily_rent_price, availability_status]);
+
+        //convert to number
+        const vehicle = result.rows[0];
+        vehicle.daily_rent_price = parseFloat(vehicle.daily_rent_price);
+
 
         res.status(201).json({
             success: true,
-            message: "user name added successfully..",
+            message: "Vehicle created successfully",
             data: result.rows[0]
         })
 
     } catch (err: any) {
+        console.log("DB Error =>", err);
         res.status(500).json({
             success: false,
             message: "Api is not working"
         })
     }
+});
 
 
+//Bookings post or Create Booking
+app.post("/api/v1/bookings", async (req: Request, res: Response) => {
+    const { customer_id, vehicle_id, rent_start_date, rent_end_date } = req.body;
+
+    try {
+        //date validation
+        const startDate = new Date(rent_start_date);
+        const endDate = new Date(rent_end_date);
+
+        if (endDate <= startDate) {
+            return res.status(400).json({
+                success: false,
+                message: "rent_end_date must be after rent_start_date "
+            })
+        };
+
+        //vehicle daily rate
+        const vehicleResult = await pool.query(`
+            SELECT vehicle_name, daily_rent_price FROM vehicles WHERE id = $1`,
+            [vehicle_id])
+
+
+        if (vehicleResult.rowCount === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Vehicle not found"
+            });
+        };
+
+        const vehicle = vehicleResult.rows[0];
+
+        //calculation
+        const durationInMs = endDate.getTime() - startDate.getTime();
+        const durationInDays = Math.ceil(durationInMs / (1000 * 60 * 60 * 24));
+
+        //total_price
+        const total_price = parseFloat(vehicle.daily_rent_price) * durationInDays;
+
+        const bookingResult = await pool.query(`
+            INSERT INTO bookings(customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status)VALUES($1,$2,$3,$4,$5,$6) RETURNING id, customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status`, [customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, 'active']);
+
+        //convert to number
+        // const vehicle = result.rows[0];
+        // vehicle.daily_rent_price = parseFloat(vehicle.daily_rent_price);
+
+
+        const booking = bookingResult.rows[0];
+
+        //Attach vehicle inside response
+        booking.vehicle = {
+            vehicle_name: vehicle.vehicle_name,
+            daily_rent_price: parseFloat(vehicle.daily_rent_price)
+        };
+
+        res.status(201).json({
+            success: true,
+            message: "Booking created successfully",
+            data: booking
+        });
+
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
 });
 
 
