@@ -8,4 +8,6 @@ router.post("/api/v1/auth/signup", userControllers.createUser);
 
 router.get("/api/v1/users", userControllers.getUsers);
 
+router.put("/api/v1/users/:id", userControllers.updateUser);
+
 export const userRoutes = router;

@@ -44,9 +44,37 @@ const getUsers = async (req: Request, res: Response) => {
             message: "Api is not working"
         })
     }
-}
+};
+
+const updateUser = async (req: Request, res: Response) => {
+    const { name, email, phone, role } = req.body;
+    try {
+        const result = await userServices.updateUser(name, email, phone, role, req.params.id);
+
+        if (result.rows.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Users retrieved successfully",
+            data: result.rows
+        })
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
+};
+
 
 export const userControllers = {
     createUser,
     getUsers,
+    updateUser,
 }

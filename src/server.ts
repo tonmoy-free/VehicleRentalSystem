@@ -28,14 +28,29 @@ app.get('/', logger, (req: Request, res: Response) => {
 //users post
 app.use("/", userRoutes);
 
-// app.get("/user", async (req: Request, res: Response) => {
+// app.put("/user/:id", async (req: Request, res: Response) => {
+//     const { name, email, phone, role } = req.body;
 //     try {
-//         const result = await pool.query(`SELECT * FROM users`);
+//         const result = await pool.query(`UPDATE users SET
+//              name = COALESCE($1, name),
+//              email = COALESCE($2, email),
+//              phone = COALESCE($3, phone),
+//              role = COALESCE($4, role),
+//              updated_at = NOW() 
+//              WHERE id=$5 
+//              RETURNING id, name, email, phone,role`, [name, email, phone, role, req.params.id]);
+
+//         if (result.rows.length === 0) {
+//             res.status(404).json({
+//                 success: false,
+//                 message: "User not found"
+//             })
+//         }
 
 //         res.status(200).json({
-//             success:true,
-//             message:"Users retrieved successfully",
-//             data:result.rows
+//             success: true,
+//             message: "Users retrieved successfully",
+//             data: result.rows
 //         })
 //     } catch (err: any) {
 //         console.log("DB Error =>", err);
