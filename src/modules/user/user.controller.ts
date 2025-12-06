@@ -49,7 +49,7 @@ const getUsers = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
     const { name, email, phone, role } = req.body;
     try {
-        const result = await userServices.updateUser(name, email, phone, role, req.params.id);
+        const result = await userServices.updateUser(name, email, phone, role, req.params.userId);
 
         if (result.rows.length === 0) {
             res.status(404).json({
