@@ -10,4 +10,7 @@ router.get("/api/v1/users", userControllers.getUsers);
 
 router.put("/api/v1/users/:id", userControllers.updateUser);
 
+router.delete("/api/v1/users/:userId", userControllers.deleteUser);
+
+
 export const userRoutes = router;

@@ -28,7 +28,32 @@ app.get('/', logger, (req: Request, res: Response) => {
 //users post
 app.use("/", userRoutes);
 
-// app.put("/user/:id", async (req: Request, res: Response) => {
+// app.delete("/user/:id", async (req: Request, res: Response) => {
+//     // console.log(req.params.id);
+//     try {
+//         const result = await pool.query(`DELETE FROM users WHERE id = $1`, [req.params.id]);
+
+//         if (result.rowCount === 0) {
+//             res.status(404).json({
+//                 success: false,
+//                 message: "User not found",
+//             })
+//         } else {
+//             res.status(200).json({
+//                 success: true,
+//                 message: "User deleted successfully",
+//                 data: result.rows[0],
+//             })
+//         }
+//     } catch (err: any) {
+//         console.log("DB Error =>", err);
+//         res.status(500).json({
+//             success: false,
+//             message: "Api is not working"
+//         })
+//     }
+
+// });
 //     const { name, email, phone, role } = req.body;
 //     try {
 //         const result = await pool.query(`UPDATE users SET
