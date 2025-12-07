@@ -67,6 +67,52 @@ const createBooking = async (req: Request, res: Response) => {
     }
 };
 
+const getAllBooking = async (req: Request, res: Response) => {
+    try {
+        const result = await bookingServices.getAllBooking();
+
+        res.status(200).json({
+            success: true,
+            message: "Users retrieved successfully",
+            data: result.rows
+        })
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
+};
+
+const updateBooking = async (req: Request, res: Response) => {
+    const {status } = req.body;
+    try {
+        const result = await bookingServices.updateBooking(status, req.params.bookingId)
+
+        if (result.rows.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Users retrieved successfully",
+            data: result.rows
+        })
+    } catch (err: any) {
+        console.log("DB Error =>", err);
+        res.status(500).json({
+            success: false,
+            message: "Api is not working"
+        })
+    }
+};
+
 export const bookingController = {
     createBooking,
+    getAllBooking,
+    updateBooking,
 }
