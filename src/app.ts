@@ -34,7 +34,7 @@ app.use("/", vehicleRoutes);
 app.use("/", bookingRoutes);
 
 //auth routes
-app.use("/auth" , authRoutes);
+app.use("/" , authRoutes);
 
 
 
