@@ -3,10 +3,10 @@ import { pool } from "../../config/db";
 import { userServices } from "./user.service";
 
 const createUser = async (req: Request, res: Response) => {
-    const { name, email, password, phone, role } = req.body;
+    // const { name, email, password, phone, role } = req.body;
 
     try {
-        const result = await userServices.createUser(name, email, password, phone, role);
+        const result = await userServices.createUser(req.body);
 
         // Removing password before sending response
         // const user = result.rows[0];
@@ -21,6 +21,7 @@ const createUser = async (req: Request, res: Response) => {
         })
 
     } catch (err: any) {
+        console.log("DB Error =>", err);
         res.status(500).json({
             success: false,
             message: "Api is not working"
